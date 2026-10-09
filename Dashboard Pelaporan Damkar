@@ -1,0 +1,2346 @@
+<!DOCTYPE html>
+
+<html lang="id" class="dark">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width,
+initial-scale=1.0">
+
+<title>Dashboard Laporan Damkar - Command Center</title>
+
+
+
+<!-- Tailwind CSS CDN -->
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+<script>
+
+tailwind.config = {
+
+darkMode: 'class',
+
+theme: {
+
+extend: {
+
+colors: {
+
+fire: {
+
+50: '#fff1f1',
+
+100: '#ffdfdf',
+
+500: '#ef4444',
+
+600: '#dc2626',
+
+700: '#b91c1c',
+
+800: '#991b1b',
+
+900: '#7f1d1d',
+
+}
+
+}
+
+}
+
+}
+
+}
+
+</script>
+
+<!-- Chart.js CDN -->
+
+<script
+src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- PapaParse CDN for CSV parsing -->
+
+<script
+src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+
+<!-- FontAwesome CDN -->
+
+<link
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+rel="stylesheet">
+
+<!-- Google Fonts Inter & Plus Jakarta Sans -->
+
+<link
+href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+rel="stylesheet">
+
+
+
+<style>
+
+body {
+
+font-family: 'Plus Jakarta Sans', sans-serif;
+
+background-color: #0b0f19;
+
+color: #f3f4f6;
+
+}
+
+
+
+::-webkit-scrollbar {
+
+width: 6px;
+
+height: 6px;
+
+}
+
+::-webkit-scrollbar-track {
+
+background: #111827; 
+
+}
+
+::-webkit-scrollbar-thumb {
+
+background: #374151; 
+
+border-radius: 9999px;
+
+}
+
+::-webkit-scrollbar-thumb:hover {
+
+background: #ef4444; 
+
+}
+
+
+
+.glass-panel {
+
+background: rgba(17, 24, 39, 0.75);
+
+backdrop-filter: blur(16px);
+
+-webkit-backdrop-filter: blur(16px);
+
+border: 1px solid rgba(255, 255, 255, 0.08);
+
+}
+
+
+
+.glass-panel-hover:hover {
+
+border-color: rgba(239, 68, 68, 0.4);
+
+box-shadow: 0 10px 30px -10px rgba(239, 68, 68, 0.15);
+
+}
+
+
+
+.loader {
+
+border: 3px solid rgba(239, 68, 68, 0.2);
+
+border-top: 3px solid #ef4444;
+
+border-radius: 50%;
+
+width: 36px;
+
+height: 36px;
+
+animation: spin 0.8s linear infinite;
+
+}
+
+
+
+@keyframes spin {
+
+0% { transform: rotate(0deg); }
+
+100% { transform: rotate(360deg); }
+
+}
+
+
+
+.pulse-alarm {
+
+animation: pulse-red 2s infinite;
+
+}
+
+@keyframes pulse-red {
+
+0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+
+70% { box-shadow: 0 0 0 12px rgba(239, 68, 68, 0); }
+
+100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+
+}
+
+</style>
+
+</head>
+
+<body class="min-h-screen flex flex-col lg:flex-row overflow-x-hidden
+bg-slate-950 text-slate-100 antialiased">
+
+
+
+<aside class="w-full lg:w-72 glass-panel flex flex-col justify-between
+sticky top-0 lg:h-screen z-40 border-r border-slate-800">
+
+<div class="p-5">
+
+<!-- App Brand -->
+
+<div class="flex items-center gap-3 mb-8 pb-4 border-b
+border-slate-800">
+
+<div class="bg-gradient-to-tr from-red-600 to-amber-500 text-white p-3
+rounded-2xl shadow-lg shadow-red-600/30 pulse-alarm flex items-center
+justify-center">
+
+<i class="fa-solid fa-fire-extinguisher text-xl"></i>
+
+</div>
+
+<div>
+
+<h1 class="text-xl font-extrabold tracking-tight
+text-white">DAMKAR<span
+class="text-red-500">HUB</span></h1>
+
+<p class="text-[11px] font-medium text-slate-400">Command
+Center Emergency v3.0</p>
+
+</div>
+
+</div>
+
+
+
+<!-- Navigation Links -->
+
+<nav class="space-y-2">
+
+<a href="#" class="flex items-center justify-between
+bg-red-500/15 text-red-400 px-4 py-3 rounded-xl border border-red-500/30
+shadow-sm font-semibold text-sm transition-all">
+
+<div class="flex items-center gap-3">
+
+<i class="fa-solid fa-chart-pie w-5 text-red-400"></i>
+
+<span>Dashboard Utama</span>
+
+</div>
+
+<span class="flex h-2 w-2 relative">
+
+<span class="animate-ping absolute inline-flex h-full w-full
+rounded-full bg-red-400 opacity-75"></span>
+
+<span class="relative inline-flex rounded-full h-2 w-2
+bg-red-500"></span>
+
+</span>
+
+</a>
+
+
+
+<a href="https://forms.gle/x9uz7Ktye87QcUkm8"
+target="_blank" class="flex items-center justify-between
+text-slate-300 hover:text-white hover:bg-slate-800/80 px-4 py-3 rounded-xl
+transition-all text-sm font-medium border border-transparent
+hover:border-slate-700">
+
+<div class="flex items-center gap-3">
+
+<i class="fa-brands fa-google w-5 text-sky-400"></i>
+
+<span>Google Form Direct</span>
+
+</div>
+
+<i class="fa-solid fa-external-link text-xs
+text-slate-500"></i>
+
+</a>
+
+
+
+<a
+href="https://docs.google.com/spreadsheets/d/1hT9prF1FJ9nSU2sCV4tEnoNQ-shcTKuUUL8Zq1VG7AE/edit?gid=834153259#gid=834153259"
+target="_blank" class="flex items-center justify-between
+text-slate-300 hover:text-white hover:bg-slate-800/80 px-4 py-3 rounded-xl
+transition-all text-sm font-medium border border-transparent
+hover:border-slate-700">
+
+<div class="flex items-center gap-3">
+
+<i class="fa-solid fa-table-cells w-5 text-emerald-400"></i>
+
+<span>Database Sheet</span>
+
+</div>
+
+<i class="fa-solid fa-external-link text-xs
+text-slate-500"></i>
+
+</a>
+
+</nav>
+
+
+
+<!-- Auto Sync Controls -->
+
+<div class="mt-8 p-4 rounded-xl bg-slate-900/80 border
+border-slate-800">
+
+<label class="text-xs font-semibold text-slate-400 block mb-2">
+
+<i class="fa-solid fa-rotate text-red-400 mr-1"></i>
+Auto-Sync Interval
+
+</label>
+
+<select id="auto-sync-select"
+onchange="changeAutoSyncInterval()" class="w-full bg-slate-950
+border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-200
+focus:outline-none focus:border-red-500">
+
+<option value="0">Manual Refresh Sahaja</option>
+
+<option value="15000">Setiap 15 Detik</option>
+
+<option value="30000" selected>Setiap 30 Detik</option>
+
+<option value="60000">Setiap 1 Menit</option>
+
+</select>
+
+<p id="next-sync-label" class="text-[10px] text-slate-500
+mt-2">Sinkronisasi otomatis aktif</p>
+
+</div>
+
+</div>
+
+
+
+<div class="p-5 border-t border-slate-800/80 bg-slate-900/40">
+
+<div id="connection-status" class="flex items-center gap-2
+text-xs font-medium text-amber-400">
+
+<i class="fa-solid fa-circle-notch fa-spin"></i>
+
+<span>Menghubungkan ke Spreadsheet...</span>
+
+</div>
+
+<p class="text-[10px] text-slate-500 mt-1">Direct CSV API
+Google Sheets</p>
+
+</div>
+
+</aside>
+
+
+
+<main class="flex-1 p-4 lg:p-8 overflow-y-auto space-y-6">
+
+
+
+<!-- Header Bar -->
+
+<header class="flex flex-col md:flex-row justify-between items-start
+md:items-center gap-4 bg-slate-900/60 p-5 rounded-2xl glass-panel shadow-lg
+border border-slate-800">
+
+<div>
+
+<div class="flex items-center gap-2">
+
+<h2 class="text-xl md:text-2xl font-bold text-white
+tracking-tight">Ringkasan Operasional Emergency</h2>
+
+<span class="text-[10px] bg-red-500/20 text-red-400 border
+border-red-500/30 px-2.5 py-0.5 rounded-full font-semibold">LIVE
+CONNECTED</span>
+
+</div>
+
+<p class="text-slate-400 text-xs mt-1">Data terpusat dari
+laporan Google Form & Google Sheets database.</p>
+
+</div>
+
+
+
+<div class="flex items-center gap-3 w-full md:w-auto justify-between
+md:justify-end">
+
+<div class="text-right hidden sm:block">
+
+<p class="text-xs font-bold text-slate-200"
+id="current-date">Memuat Tanggal...</p>
+
+<p class="text-[11px] font-mono text-red-400"
+id="current-time">00:00:00 WIB</p>
+
+</div>
+
+<div class="flex gap-2">
+
+<a href="https://forms.gle/x9uz7Ktye87QcUkm8"
+target="_blank" class="bg-amber-500/20 hover:bg-amber-500/30
+text-amber-300 border border-amber-500/30 px-3.5 py-2 rounded-xl transition-all
+flex items-center gap-2 text-xs font-semibold">
+
+<i class="fa-solid fa-external-link text-amber-400"></i>
+Buka Google Form
+
+</a>
+
+<button onclick="fetchData()" class="bg-gradient-to-r
+from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white px-4
+py-2 rounded-xl transition-all shadow-lg shadow-red-600/30 flex items-center
+gap-2 text-xs font-semibold cursor-pointer active:scale-95">
+
+<i class="fa-solid fa-rotate-right"
+id="refresh-icon"></i> Sync Data
+
+</button>
+
+</div>
+
+</div>
+
+</header>
+
+
+
+<!-- Notification Banner -->
+
+<div id="notification-banner" class="hidden p-4 rounded-xl
+text-xs flex items-center justify-between border transition-all">
+
+<div class="flex items-center gap-2">
+
+<i class="fa-solid fa-circle-info text-sm"
+id="notification-icon"></i>
+
+<span id="notification-text"></span>
+
+</div>
+
+<button onclick="closeNotification()" class="text-slate-400
+hover:text-white"><i class="fa-solid
+fa-xmark"></i></button>
+
+</div>
+
+
+
+<!-- Loading Overlay -->
+
+<div id="loading-overlay" class="flex flex-col items-center
+justify-center py-20">
+
+<div class="loader mb-3"></div>
+
+<p class="text-slate-400 text-xs font-medium
+animate-pulse">Mengunduh & memproses data dari Google
+Spreadsheet...</p>
+
+</div>
+
+
+
+<!-- Dashboard Body Content -->
+
+<div id="dashboard-content" class="hidden space-y-6">
+
+
+
+<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3
+lg:grid-cols-5 gap-4">
+
+<!-- KPI Total -->
+
+<div class="glass-panel p-5 rounded-2xl glass-panel-hover
+transition-all">
+
+<div class="flex justify-between items-start mb-3">
+
+<div>
+
+<p class="text-[11px] font-bold uppercase tracking-wider
+text-slate-400">Total Incidents</p>
+
+<h3 class="text-3xl font-black text-white mt-1"
+id="kpi-total">0</h3>
+
+</div>
+
+<div class="w-10 h-10 rounded-xl bg-red-500/10 border border-red-500/20
+flex items-center justify-center text-red-400">
+
+<i class="fa-solid fa-fire-flame-curved text-lg"></i>
+
+</div>
+
+</div>
+
+<div class="flex items-center gap-1.5 text-[11px] text-emerald-400
+font-medium">
+
+<i class="fa-solid fa-database"></i> Terkumpul di Sheet
+Database
+
+</div>
+
+</div>
+
+
+
+<!-- KPI Kebakaran -->
+
+<div class="glass-panel p-5 rounded-2xl glass-panel-hover
+transition-all">
+
+<div class="flex justify-between items-start mb-3">
+
+<div>
+
+<p class="text-[11px] font-bold uppercase tracking-wider
+text-slate-400">Kebakaran</p>
+
+<h3 class="text-3xl font-black text-orange-400 mt-1"
+id="kpi-kebakaran">0</h3>
+
+</div>
+
+<div class="w-10 h-10 rounded-xl bg-orange-500/10 border
+border-orange-500/20 flex items-center justify-center text-orange-400">
+
+<i class="fa-solid fa-fire text-lg"></i>
+
+</div>
+
+</div>
+
+<p class="text-[11px] text-slate-400 font-medium"
+id="kpi-kebakaran-pct">0% dari total insiden</p>
+
+</div>
+
+
+
+<!-- KPI Penyelamatan -->
+
+<div class="glass-panel p-5 rounded-2xl glass-panel-hover
+transition-all">
+
+<div class="flex justify-between items-start mb-3">
+
+<div>
+
+<p class="text-[11px] font-bold uppercase tracking-wider
+text-slate-400">Rescue / Evakuasi</p>
+
+<h3 class="text-3xl font-black text-amber-400 mt-1"
+id="kpi-rescue">0</h3>
+
+</div>
+
+<div class="w-10 h-10 rounded-xl bg-amber-500/10 border
+border-amber-500/20 flex items-center justify-center text-amber-400">
+
+<i class="fa-solid fa-hand-holding-hand text-lg"></i>
+
+</div>
+
+</div>
+
+<p class="text-[11px] text-slate-400 font-medium">Penyelamatan
+non-kebakaran</p>
+
+</div>
+
+
+
+<!-- KPI Status Penanganan -->
+
+<div class="glass-panel p-5 rounded-2xl glass-panel-hover
+transition-all">
+
+<div class="flex justify-between items-start mb-3">
+
+<div>
+
+<p class="text-[11px] font-bold uppercase tracking-wider
+text-slate-400">Status Penanganan</p>
+
+<h3 class="text-3xl font-black text-emerald-400 mt-1"
+id="kpi-selesai">0</h3>
+
+</div>
+
+<div class="w-10 h-10 rounded-xl bg-emerald-500/10 border
+border-emerald-500/20 flex items-center justify-center
+text-emerald-400">
+
+<i class="fa-solid fa-circle-check text-lg"></i>
+
+</div>
+
+</div>
+
+<div class="text-[11px] text-slate-400 font-medium truncate"
+id="kpi-selesai-pct">
+
+0 Selesai &bull; 0 Belum Selesai
+
+</div>
+
+</div>
+
+
+
+<!-- KPI Response Time -->
+
+<div class="glass-panel p-5 rounded-2xl glass-panel-hover
+transition-all">
+
+<div class="flex justify-between items-start mb-3">
+
+<div>
+
+<p class="text-[11px] font-bold uppercase tracking-wider
+text-slate-400">Avg Response Time</p>
+
+<h3 class="text-3xl font-black text-cyan-400 mt-1"
+id="kpi-response-time">0 Min</h3>
+
+</div>
+
+<div class="w-10 h-10 rounded-xl bg-cyan-500/10 border
+border-cyan-500/20 flex items-center justify-center text-cyan-400">
+
+<i class="fa-solid fa-stopwatch text-lg"></i>
+
+</div>
+
+</div>
+
+<div class="flex items-center gap-1 text-[11px] text-cyan-400
+font-semibold" id="kpi-response-status">
+
+<i class="fa-solid fa-bolt"></i> Target SPM: Maks 15
+Menit
+
+</div>
+
+<p class="text-[10px] text-slate-400 font-medium mt-1"
+id="kpi-response-subtext">Standar Target: Maks. 15 Menit</p>
+
+</div>
+
+</div>
+
+
+
+<div class="glass-panel p-4 rounded-2xl border border-slate-800
+space-y-3">
+
+<div class="flex flex-col md:flex-row justify-between items-start
+md:items-center gap-3">
+
+<div class="flex items-center gap-2 text-xs font-semibold
+text-slate-300">
+
+<i class="fa-solid fa-filter text-red-500"></i>
+
+<span>Filter & Pencarian Laporan</span>
+
+</div>
+
+<button onclick="resetFilters()" class="text-xs
+text-slate-400 hover:text-red-400 transition-colors flex items-center gap-1
+cursor-pointer">
+
+<i class="fa-solid fa-arrows-rotate"></i> Reset Filter
+
+</button>
+
+</div>
+
+
+
+<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4
+gap-3">
+
+<!-- Category Filter -->
+
+<div>
+
+<label class="text-[10px] uppercase font-bold text-slate-400 block
+mb-1">Jenis Kejadian</label>
+
+<select id="filter-category" onchange="applyFilters()"
+class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2
+text-xs text-slate-200 focus:outline-none focus:border-red-500">
+
+<option value="ALL">Semua Jenis Kejadian</option>
+
+</select>
+
+</div>
+
+
+
+<!-- Status Filter (Hasil Penanganan) -->
+
+<div>
+
+<label class="text-[10px] uppercase font-bold text-slate-400 block
+mb-1">Status (Hasil Penanganan)</label>
+
+<select id="filter-status" onchange="applyFilters()"
+class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2
+text-xs text-slate-200 focus:outline-none focus:border-red-500">
+
+<option value="ALL">Semua Status Penanganan</option>
+
+</select>
+
+</div>
+
+
+
+<!-- Date Filter -->
+
+<div>
+
+<label class="text-[10px] uppercase font-bold text-slate-400 block
+mb-1">Rentang Waktu</label>
+
+<select id="filter-date" onchange="applyFilters()"
+class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2
+text-xs text-slate-200 focus:outline-none focus:border-red-500">
+
+<option value="ALL">Semua Periode</option>
+
+<option value="TODAY">Hari Ini</option>
+
+<option value="WEEK">7 Hari Terakhir</option>
+
+<option value="MONTH">Bulan Ini</option>
+
+</select>
+
+</div>
+
+
+
+<!-- Search Filter -->
+
+<div>
+
+<label class="text-[10px] uppercase font-bold text-slate-400 block
+mb-1">Cari Kata Kunci</label>
+
+<div class="relative">
+
+<i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-xs
+text-slate-500"></i>
+
+<input type="text" id="filter-search"
+onkeyup="applyFilters()" placeholder="Cari pelapor, lokasi,
+deskripsi..." class="w-full bg-slate-900 border border-slate-700
+rounded-xl pl-8 pr-3 py-2 text-xs text-slate-200 placeholder-slate-500
+focus:outline-none focus:border-red-500">
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+
+<!-- Doughnut Chart: Category -->
+
+<div class="glass-panel p-5 rounded-2xl border border-slate-800 flex
+flex-col justify-between">
+
+<div class="flex items-center justify-between mb-3">
+
+<h3 class="font-bold text-sm text-white flex items-center
+gap-2">
+
+<i class="fa-solid fa-chart-pie text-red-500"></i>
+Proporsi Jenis Kejadian
+
+</h3>
+
+</div>
+
+<div class="relative w-full h-60 flex items-center
+justify-center">
+
+<canvas id="categoryChart"></canvas>
+
+</div>
+
+</div>
+
+
+
+<!-- Line Chart: Trend -->
+
+<div class="glass-panel p-5 rounded-2xl border border-slate-800
+lg:col-span-2 flex flex-col justify-between">
+
+<div class="flex items-center justify-between mb-3">
+
+<h3 class="font-bold text-sm text-white flex items-center
+gap-2">
+
+<i class="fa-solid fa-chart-line text-red-500"></i> Tren
+Frekuensi Kejadian
+
+</h3>
+
+<span class="text-[10px] text-slate-400 bg-slate-900 px-2.5 py-1
+rounded-lg border border-slate-800">Timeline Laporan</span>
+
+</div>
+
+<div class="relative w-full h-60">
+
+<canvas id="trendChart"></canvas>
+
+</div>
+
+</div>
+
+</div>
+
+
+
+<div class="glass-panel rounded-2xl border border-slate-800
+overflow-hidden shadow-xl">
+
+<!-- Table Header Controls -->
+
+<div class="p-5 border-b border-slate-800 flex flex-col sm:flex-row
+justify-between items-start sm:items-center gap-4 bg-slate-900/40">
+
+<div>
+
+<h3 class="font-bold text-base text-white">Log Data Laporan
+Masuk</h3>
+
+<p class="text-xs text-slate-400">Sinkronisasi langsung dari
+respon Google Form</p>
+
+</div>
+
+<div class="flex items-center gap-2 w-full sm:w-auto
+justify-end">
+
+<button onclick="exportCSV()" class="bg-slate-800
+hover:bg-slate-700 text-slate-200 border border-slate-700 px-3 py-1.5
+rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5
+cursor-pointer">
+
+<i class="fa-solid fa-file-csv text-emerald-400"></i>
+Export CSV
+
+</button>
+
+</div>
+
+</div>
+
+
+
+<!-- Data Table -->
+
+<div class="overflow-x-auto">
+
+<table class="w-full text-left border-collapse"
+id="reportTable">
+
+<thead>
+
+<tr class="bg-slate-900/80 text-slate-400 text-[11px] uppercase
+tracking-wider border-b border-slate-800 select-none">
+
+<th class="py-3.5 px-5 font-bold cursor-pointer hover:text-white"
+onclick="sortTable('timestamp')">
+
+Waktu / Timestamp <i class="fa-solid fa-sort text-slate-600
+ml-1"></i>
+
+</th>
+
+<th class="py-3.5 px-5 font-bold cursor-pointer hover:text-white"
+onclick="sortTable('pelapor')">
+
+Pelapor <i class="fa-solid fa-sort text-slate-600
+ml-1"></i>
+
+</th>
+
+<th class="py-3.5 px-5 font-bold cursor-pointer hover:text-white"
+onclick="sortTable('jenis')">
+
+Jenis Kejadian <i class="fa-solid fa-sort text-slate-600
+ml-1"></i>
+
+</th>
+
+<th class="py-3.5 px-5 font-bold cursor-pointer hover:text-white"
+onclick="sortTable('responseTime')">
+
+Response Time <i class="fa-solid fa-sort text-slate-600
+ml-1"></i>
+
+</th>
+
+<th class="py-3.5 px-5 font-bold">Lokasi / Alamat</th>
+
+<th class="py-3.5 px-5 font-bold">Deskripsi / Kronologi
+(Spreadsheet)</th>
+
+<th class="py-3.5 px-5 font-bold text-center cursor-pointer
+hover:text-white" onclick="sortTable('status')">
+
+Status <i class="fa-solid fa-sort text-slate-600
+ml-1"></i>
+
+</th>
+
+<th class="py-3.5 px-5 font-bold text-center">Aksi</th>
+
+</tr>
+
+</thead>
+
+<tbody id="tableBody" class="divide-y divide-slate-800/60
+text-xs">
+
+<tr>
+
+<td colspan="8" class="text-center py-8
+text-slate-500">Memuat data tabel...</td>
+
+</tr>
+
+</tbody>
+
+</table>
+
+</div>
+
+
+
+<!-- Pagination Footer -->
+
+<div class="p-4 bg-slate-900/60 border-t border-slate-800 flex flex-col
+sm:flex-row justify-between items-center gap-3 text-xs text-slate-400">
+
+<div class="flex items-center gap-2">
+
+<span id="row-count">Menampilkan 0 data laporan</span>
+
+<select id="page-size" onchange="changePageSize()"
+class="bg-slate-950 border border-slate-800 rounded-lg px-2 py-1
+text-slate-300 focus:outline-none">
+
+<option value="5">5 per halaman</option>
+
+<option value="10" selected>10 per halaman</option>
+
+<option value="25">25 per halaman</option>
+
+</select>
+
+</div>
+
+
+
+<div class="flex items-center gap-2">
+
+<button id="btn-prev" onclick="prevPage()"
+class="bg-slate-800 hover:bg-slate-700 disabled:opacity-40
+disabled:cursor-not-allowed text-slate-300 px-3 py-1.5 rounded-lg border
+border-slate-700 transition-all font-medium cursor-pointer">
+
+<i class="fa-solid fa-chevron-left mr-1"></i> Sblm
+
+</button>
+
+<span id="page-indicator" class="font-semibold text-slate-300
+px-2">Hal 1 dari 1</span>
+
+<button id="btn-next" onclick="nextPage()"
+class="bg-slate-800 hover:bg-slate-700 disabled:opacity-40
+disabled:cursor-not-allowed text-slate-300 px-3 py-1.5 rounded-lg border
+border-slate-700 transition-all font-medium cursor-pointer">
+
+Lnjt <i class="fa-solid fa-chevron-right ml-1"></i>
+
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+
+
+</div>
+
+</main>
+
+
+
+<!-- Modal Preview Detail -->
+
+<div id="detail-modal" class="fixed inset-0 z-50 flex
+items-center justify-center bg-black/70 backdrop-blur-sm hidden p-4">
+
+<div class="glass-panel w-full max-w-lg rounded-2xl border
+border-slate-700 shadow-2xl overflow-hidden">
+
+<div class="p-5 border-b border-slate-800 flex justify-between
+items-center bg-slate-900/80">
+
+<div class="flex items-center gap-2.5">
+
+<div class="bg-red-500/20 p-2 rounded-xl border border-red-500/30
+text-red-400">
+
+<i class="fa-solid fa-shield-halved"></i>
+
+</div>
+
+<h3 class="font-bold text-white text-base">Detail Laporan
+Darurat</h3>
+
+</div>
+
+<button onclick="closeDetailModal()" class="text-slate-400
+hover:text-white p-1 cursor-pointer">
+
+<i class="fa-solid fa-xmark text-lg"></i>
+
+</button>
+
+</div>
+
+
+
+<div class="p-6 space-y-4 text-xs">
+
+<div class="grid grid-cols-2 gap-3 p-3 rounded-xl bg-slate-900/60
+border border-slate-800">
+
+<div>
+
+<p class="text-slate-400 text-[10px] uppercase
+font-bold">Timestamp Laporan</p>
+
+<p class="text-slate-200 font-mono mt-0.5"
+id="modal-time">-</p>
+
+</div>
+
+<div>
+
+<p class="text-slate-400 text-[10px] uppercase font-bold">Status
+Penanganan</p>
+
+<div class="mt-0.5" id="modal-status">-</div>
+
+</div>
+
+</div>
+
+
+
+<div class="p-3 rounded-xl bg-cyan-950/30 border border-cyan-800/40
+flex items-center justify-between">
+
+<div>
+
+<p class="text-cyan-400 text-[10px] uppercase font-bold flex
+items-center gap-1">
+
+<i class="fa-solid fa-stopwatch"></i> Waktu Tanggap /
+Response Time
+
+</p>
+
+<p class="text-white text-base font-black font-mono mt-0.5"
+id="modal-response-time">-</p>
+
+</div>
+
+<span class="text-[10px] bg-cyan-500/20 text-cyan-300 border
+border-cyan-500/30 px-2.5 py-1 rounded-full font-semibold"
+id="modal-response-badge">
+
+Memenuhi SPM
+
+</span>
+
+</div>
+
+
+
+<div>
+
+<p class="text-slate-400 text-[10px] uppercase font-bold
+mb-1">Nama Pelapor</p>
+
+<p class="text-slate-100 text-sm font-semibold p-2.5 rounded-xl
+bg-slate-900/80 border border-slate-800"
+id="modal-pelapor">-</p>
+
+</div>
+
+
+
+<div>
+
+<p class="text-slate-400 text-[10px] uppercase font-bold
+mb-1">Jenis Kejadian</p>
+
+<p class="text-red-400 text-sm font-bold p-2.5 rounded-xl bg-red-950/30
+border border-red-900/40" id="modal-jenis">-</p>
+
+</div>
+
+
+
+<div>
+
+<p class="text-slate-400 text-[10px] uppercase font-bold
+mb-1">Lokasi Kejadian</p>
+
+<div class="p-3 rounded-xl bg-slate-900/80 border border-slate-800 flex
+items-start justify-between gap-2">
+
+<p class="text-slate-200"
+id="modal-lokasi">-</p>
+
+<a id="modal-map-btn" href="#" target="_blank"
+class="bg-slate-800 hover:bg-slate-700 text-sky-400 p-2 rounded-lg border
+border-slate-700 transition-colors shrink-0" title="Buka
+Maps">
+
+<i class="fa-solid fa-map-location-dot"></i>
+
+</a>
+
+</div>
+
+</div>
+
+
+
+<div>
+
+<p class="text-slate-400 text-[10px] uppercase font-bold
+mb-1">Deskripsi & Kronologi Kejadian</p>
+
+<p class="text-slate-300 p-3 rounded-xl bg-slate-900/80 border
+border-slate-800 leading-relaxed min-h-[60px]"
+id="modal-keterangan">-</p>
+
+</div>
+
+
+
+<!-- Dynamic Spreadsheet All Columns Breakdown -->
+
+<div>
+
+<p class="text-slate-400 text-[10px] uppercase font-bold mb-1.5 flex
+items-center gap-1.5 text-amber-400">
+
+<i class="fa-solid fa-table-list"></i> Seluruh Rincian
+Kolom Google Spreadsheet
+
+</p>
+
+<div id="modal-raw-fields" class="space-y-2 max-h-48
+overflow-y-auto pr-1">
+
+<!-- Rendered dynamically -->
+
+</div>
+
+</div>
+
+</div>
+
+
+
+<div class="p-4 bg-slate-900/80 border-t border-slate-800 flex
+justify-end">
+
+<button onclick="closeDetailModal()" class="bg-slate-800
+hover:bg-slate-700 text-slate-200 px-4 py-2 rounded-xl text-xs font-semibold
+transition-all cursor-pointer">
+
+Tutup
+
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+
+
+<script>
+
+// Live Clock Counter
+
+function updateClock() {
+
+const now = new Date();
+
+const optionsDate = { weekday: 'long', year: 'numeric', month: 'short', day:
+'numeric' };
+
+document.getElementById('current-date').innerText =
+now.toLocaleDateString('id-ID', optionsDate);
+
+document.getElementById('current-time').innerText =
+now.toLocaleTimeString('id-ID') + ' WIB';
+
+}
+
+setInterval(updateClock, 1000);
+
+updateClock();
+
+
+
+// Application State
+
+let rawData = [];
+
+let filteredData = [];
+
+let categoryChartInstance = null;
+
+let trendChartInstance = null;
+
+
+
+let currentPage = 1;
+
+let pageSize = 10;
+
+let sortColumn = 'timestamp';
+
+let sortAsc = false;
+
+let autoSyncTimer = null;
+
+
+
+// URL Web App Google Apps Script. Setelah Code.gs dideploy,
+// ganti nilai ini dengan URL berakhiran /exec.
+const API_URL = 'https://script.google.com/macros/s/AKfycbykkERPNDDcZjB-cEeeTHsJJ47WGbxkqz6gI05WvPwgpeZmjTMp1RImrMcTV0yJAqGpAg/exec';
+const DATABASE_SPREADSHEET_ID = '1hT9prF1FJ9nSU2sCV4tEnoNQ-shcTKuUUL8Zq1VG7AE';
+const DATABASE_SHEET_GID = '834153259';
+
+
+
+function showNotification(message, isError = false) {
+
+const banner = document.getElementById('notification-banner');
+
+const text = document.getElementById('notification-text');
+
+const icon = document.getElementById('notification-icon');
+
+
+
+text.innerText = message;
+
+if (isError) {
+
+banner.className = 'p-4 rounded-xl text-xs flex items-center justify-between border transition-all bg-red-500/20 border-red-500/40 text-red-200';
+
+icon.className = 'fa-solid fa-triangle-exclamation text-red-400 text-sm';
+
+} else {
+
+banner.className = 'p-4 rounded-xl text-xs flex items-center justify-between border transition-all bg-emerald-500/20 border-emerald-500/40 text-emerald-200';
+
+icon.className = 'fa-solid fa-circle-check text-emerald-400 text-sm';
+
+}
+
+banner.classList.remove('hidden');
+
+}
+
+
+
+function closeNotification() {
+
+document.getElementById('notification-banner').classList.add('hidden');
+
+}
+
+
+
+async function fetchData() {
+const statusEl=document.getElementById('connection-status');
+const refreshIcon=document.getElementById('refresh-icon');
+const loadingOverlay=document.getElementById('loading-overlay');
+const dashboardContent=document.getElementById('dashboard-content');
+if(refreshIcon) refreshIcon.classList.add('fa-spin');
+statusEl.innerHTML=`<i class="fa-solid fa-circle-notch fa-spin text-amber-400"></i><span class="text-amber-400">Menghubungkan ke Database...</span>`;
+if(rawData.length===0){loadingOverlay.style.display='flex';dashboardContent.classList.add('hidden');}
+if(!API_URL||API_URL==='PASTE_APPS_SCRIPT_WEB_APP_URL_HERE'){
+ if(refreshIcon) refreshIcon.classList.remove('fa-spin'); loadingOverlay.style.display='none'; dashboardContent.classList.remove('hidden');
+ statusEl.innerHTML=`<i class="fa-solid fa-triangle-exclamation text-amber-400"></i><span class="text-amber-400 font-semibold">API belum dikonfigurasi</span>`;
+ showNotification('Masukkan URL Web App Google Apps Script pada konstanta API_URL di index.html.',true);
+ rawData=[]; populateCategoryDropdown(rawData); populateStatusDropdown(rawData); applyFilters(); return;
+}
+try{
+ const response=await fetch(`${API_URL}?t=${Date.now()}`,{method:'GET',cache:'no-store',redirect:'follow'});
+ if(!response.ok) throw new Error(`HTTP ${response.status} - ${response.statusText}`);
+ const result=await response.json();
+ if(!result.success) throw new Error(result.message||'API mengembalikan status gagal.');
+ const rows=Array.isArray(result.data)?result.data:[];
+ rawData=normalizeData(rows);
+ statusEl.innerHTML=`<i class="fa-solid fa-circle-check text-emerald-400"></i><span class="text-emerald-400 font-semibold">Live Database Connected</span>`;
+ showNotification(`Berhasil memuat ${Number(result.total??rows.length)} data laporan dari Google Spreadsheet.`);
+ loadingOverlay.style.display='none'; dashboardContent.classList.remove('hidden');
+ populateCategoryDropdown(rawData); populateStatusDropdown(rawData); applyFilters();
+}catch(err){
+ console.error('Database API error:',err); loadingOverlay.style.display='none'; dashboardContent.classList.remove('hidden');
+ statusEl.innerHTML=`<i class="fa-solid fa-triangle-exclamation text-red-400"></i><span class="text-red-400 font-semibold">Database API gagal</span>`;
+ showNotification(`Gagal mengambil data dari backend: ${err.message}`,true);
+ populateCategoryDropdown(rawData); populateStatusDropdown(rawData); applyFilters();
+}finally{if(refreshIcon) refreshIcon.classList.remove('fa-spin');}
+}
+
+function normalizeData(data) {
+return data.map((row,index)=>{
+ const keys=Object.keys(row);
+ const findVal=(terms)=>{for(const term of terms){const key=keys.find(k=>k.toLowerCase().includes(term.toLowerCase()));if(key&&row[key]!==undefined&&row[key]!==null&&String(row[key]).trim()!=='')return String(row[key]).trim();}return '';};
+ const timestamp=findVal(['timestamp','waktu','tanggal','time','date'])||'-';
+ const pelapor=findVal(['nama pelapor','nama','pelapor','pengirim','pelapor/saksi','identitas'])||'Warga (Anonim)';
+ const jenis=findVal(['jenis kejadian','jenis','kejadian','kategori','insiden','musibah','tipe'])||'Tidak diketahui';
+ const responseTime=findVal(['response time','response','tanggap','waktu tanggap','durasi','kecepatan','respon'])||'-';
+ const lokasi=findVal(['lokasi kejadian','lokasi','alamat','tempat','posisi','titik'])||'Wilayah Operasional Damkar';
+ const keterangan=findVal(['deskripsi kejadian','deskripsi','kronologi','keterangan','detail','catatan','uraian','rincian','penjelasan','informasi'])||'Tidak ada deskripsi detail';
+ const status=findVal(['hasil penanganan','hasil','status penanganan','status','penanganan','kondisi','progres','tindak lanjut'])||'Belum Ada Status';
+ return {id:Number(row._row)||index+1,timestamp,pelapor,jenis,responseTime,lokasi,keterangan,status,rawRow:row};
+}).filter(item => {
+ // Dashboard hanya menampilkan laporan yang sudah selesai/dituntaskan.
+ const s = String(item.status || '').toLowerCase();
+ return s.includes('selesai') || s.includes('tuntas') || s.includes('teratasi') || s.includes('done');
+});
+}
+
+
+
+function populateCategoryDropdown(data) {
+
+const catSelect = document.getElementById('filter-category');
+
+const categories = [...new Set(data.map(d => d.jenis))].filter(Boolean);
+
+
+
+catSelect.innerHTML = `<option value="ALL">Semua Jenis Kejadian
+(${data.length})</option>`;
+
+categories.forEach(cat => {
+
+const count = data.filter(d => d.jenis === cat).length;
+
+catSelect.innerHTML += `<option value="${cat}">${cat}
+(${count})</option>`;
+
+});
+
+}
+
+
+
+function populateStatusDropdown(data) {
+
+const statusSelect = document.getElementById('filter-status');
+
+if (!statusSelect) return;
+
+const statuses = [...new Set(data.map(d => d.status))].filter(Boolean);
+
+
+
+statusSelect.innerHTML = `<option value="ALL">Status Selesai Saja (${data.length})</option>`;
+
+statuses.forEach(st => {
+
+const count = data.filter(d => d.status === st).length;
+
+statusSelect.innerHTML += `<option
+value="${escapeHtml(st)}">${escapeHtml(st)}
+(${count})</option>`;
+
+});
+
+}
+
+
+
+function processKPIs(data) {
+
+const total = data.length;
+
+const kebakaranCount = data.filter(d =>
+d.jenis.toLowerCase().includes('kebakaran') ||
+d.jenis.toLowerCase().includes('fire')).length;
+
+const rescueCount = data.filter(d => d.jenis.toLowerCase().includes('evakuasi')
+|| d.jenis.toLowerCase().includes('rescue') ||
+d.jenis.toLowerCase().includes('penyelamatan') ||
+d.jenis.toLowerCase().includes('pohon')).length;
+
+
+
+// Mengambil jumlah status Selesai
+
+const selesaiCount = data.filter(d => {
+
+const s = (d.status || '').toLowerCase();
+
+return s.includes('selesai') || s.includes('tuntas') || s.includes('teratasi')
+|| s.includes('done');
+
+}).length;
+
+const belumSelesaiCount = total - selesaiCount;
+
+
+
+// Compute Average Response Time in Minutes and Overtime Count (>15 Min)
+
+let totalResponseMinutes = 0;
+
+let validResponseCount = 0;
+
+let overtimeCount = 0;
+
+data.forEach(d => {
+
+const numMatch = String(d.responseTime || '').match(/\d+/);
+
+if (numMatch) {
+
+const mins = parseInt(numMatch[0]);
+
+totalResponseMinutes += mins;
+
+validResponseCount++;
+
+if (mins > 15) overtimeCount++;
+
+}
+
+});
+
+const avgResponse = validResponseCount > 0 ? (totalResponseMinutes /
+validResponseCount).toFixed(1) : 0;
+
+
+
+document.getElementById('kpi-total').innerText = total;
+
+document.getElementById('kpi-kebakaran').innerText = kebakaranCount;
+
+document.getElementById('kpi-rescue').innerText = rescueCount;
+
+document.getElementById('kpi-selesai').innerText = selesaiCount;
+
+document.getElementById('kpi-response-time').innerText = `${avgResponse} Min`;
+
+
+
+const kebPct = total > 0 ? Math.round((kebakaranCount / total) * 100) : 0;
+
+
+
+document.getElementById('kpi-kebakaran-pct').innerText = `${kebPct}% dari total
+laporan`;
+
+document.getElementById('kpi-selesai-pct').innerHTML = `<span
+class="text-emerald-400 font-semibold">${selesaiCount}
+Selesai</span> &bull; <span class="text-slate-400
+font-medium">${belumSelesaiCount} Belum Selesai</span>`;
+
+
+
+const responseStatusEl = document.getElementById('kpi-response-status');
+
+const responseSubtextEl = document.getElementById('kpi-response-subtext');
+
+
+
+if (parseFloat(avgResponse) <= 15) {
+
+responseStatusEl.className = 'flex items-center gap-1 text-[11px] text-emerald-400 font-semibold';
+
+responseStatusEl.innerHTML = `<i class="fa-solid
+fa-circle-check"></i> Sesuai Target SPM (≤15 Min)`;
+
+} else {
+
+responseStatusEl.className = 'flex items-center gap-1 text-[11px] text-red-400 font-bold animate-pulse';
+
+responseStatusEl.innerHTML = `<i class="fa-solid
+fa-triangle-exclamation"></i> Tidak Sesuai Target SPM (>15
+Min)`;
+
+}
+
+
+
+if (responseSubtextEl) {
+
+responseSubtextEl.innerHTML = overtimeCount > 0 
+
+? `<span class="text-red-400 font-semibold">${overtimeCount}
+laporan</span> melebihi standar 15 min`
+
+: `Semua laporan memenuhi standar ≤15 min`;
+
+}
+
+}
+
+
+
+function applyFilters() {
+
+const selectedCat = document.getElementById('filter-category').value;
+
+const selectedStatus = document.getElementById('filter-status').value;
+
+const selectedDate = document.getElementById('filter-date').value;
+
+const searchKeyword =
+document.getElementById('filter-search').value.toLowerCase().trim();
+
+
+
+const now = new Date();
+
+
+
+filteredData = rawData.filter(item => {
+
+// Category Filter
+
+if (selectedCat !== 'ALL' && item.jenis !== selectedCat) {
+
+return false;
+
+}
+
+
+
+// Status Filter (Strict Selesai / Belum Selesai)
+
+if (selectedStatus !== 'ALL') {
+
+if (item.status !== selectedStatus) {
+
+return false;
+
+}
+
+}
+
+
+
+// Date Filter
+
+if (selectedDate !== 'ALL' && item.timestamp) {
+
+const itemDate = new Date(item.timestamp.replace(' ', 'T'));
+
+if (!isNaN(itemDate.getTime())) {
+
+const diffTime = Math.abs(now - itemDate);
+
+const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+
+
+if (selectedDate === 'TODAY' && itemDate.toDateString() !==
+now.toDateString()) {
+
+return false;
+
+} else if (selectedDate === 'WEEK' && diffDays > 7) {
+
+return false;
+
+} else if (selectedDate === 'MONTH' && (itemDate.getMonth() !==
+now.getMonth() || itemDate.getFullYear() !== now.getFullYear())) {
+
+return false;
+
+}
+
+}
+
+}
+
+
+
+// Search Filter
+
+if (searchKeyword !== '') {
+
+const matchPelapor = item.pelapor.toLowerCase().includes(searchKeyword);
+
+const matchLokasi = item.lokasi.toLowerCase().includes(searchKeyword);
+
+const matchKeterangan = item.keterangan.toLowerCase().includes(searchKeyword);
+
+const matchJenis = item.jenis.toLowerCase().includes(searchKeyword);
+
+const matchStatus = item.status.toLowerCase().includes(searchKeyword);
+
+
+
+if (!matchPelapor && !matchLokasi && !matchKeterangan
+&& !matchJenis && !matchStatus) {
+
+return false;
+
+}
+
+}
+
+
+
+return true;
+
+});
+
+
+
+processKPIs(filteredData);
+
+updateCharts(filteredData);
+
+currentPage = 1;
+
+renderTable();
+
+}
+
+
+
+function resetFilters() {
+
+document.getElementById('filter-category').value = 'ALL';
+
+document.getElementById('filter-status').value = 'ALL';
+
+document.getElementById('filter-date').value = 'ALL';
+
+document.getElementById('filter-search').value = '';
+
+applyFilters();
+
+}
+
+
+
+function sortTable(column) {
+
+if (sortColumn === column) {
+
+sortAsc = !sortAsc;
+
+} else {
+
+sortColumn = column;
+
+sortAsc = true;
+
+}
+
+renderTable();
+
+}
+
+
+
+function updateCharts(data) {
+
+// 1. Category Chart (Doughnut)
+
+const categoryCounts = {};
+
+data.forEach(d => {
+
+const cat = d.jenis || 'Lain-lain';
+
+categoryCounts[cat] = (categoryCounts[cat] || 0) + 1;
+
+});
+
+
+
+const catLabels = Object.keys(categoryCounts);
+
+const catData = Object.values(categoryCounts);
+
+
+
+if (categoryChartInstance) {
+
+categoryChartInstance.destroy();
+
+}
+
+
+
+const ctxCat = document.getElementById('categoryChart').getContext('2d');
+
+categoryChartInstance = new Chart(ctxCat, {
+
+type: 'doughnut',
+
+data: {
+
+labels: catLabels,
+
+datasets: [{
+
+data: catData,
+
+backgroundColor: [
+
+'#ef4444', '#f97316', '#f59e0b', '#06b6d4', '#3b82f6', '#8b5cf6', '#ec4899',
+'#10b981'
+
+],
+
+borderWidth: 2,
+
+borderColor: '#0f172a'
+
+}]
+
+},
+
+options: {
+
+responsive: true,
+
+maintainAspectRatio: false,
+
+plugins: {
+
+legend: {
+
+position: 'bottom',
+
+labels: { color: '#94a3b8', font: { size: 11, family: 'Plus Jakarta Sans' } }
+
+}
+
+}
+
+}
+
+});
+
+
+
+// 2. Trend Chart (Line)
+
+const dateCounts = {};
+
+data.forEach(d => {
+
+let dateStr = 'Unknown';
+
+if (d.timestamp) {
+
+dateStr = d.timestamp.split(' ')[0] || d.timestamp.split('T')[0] ||
+d.timestamp;
+
+}
+
+dateCounts[dateStr] = (dateCounts[dateStr] || 0) + 1;
+
+});
+
+
+
+const sortedDates = Object.keys(dateCounts).sort();
+
+const trendData = sortedDates.map(date => dateCounts[date]);
+
+
+
+if (trendChartInstance) {
+
+trendChartInstance.destroy();
+
+}
+
+
+
+const ctxTrend = document.getElementById('trendChart').getContext('2d');
+
+trendChartInstance = new Chart(ctxTrend, {
+
+type: 'line',
+
+data: {
+
+labels: sortedDates,
+
+datasets: [{
+
+label: 'Jumlah Laporan',
+
+data: trendData,
+
+borderColor: '#ef4444',
+
+backgroundColor: 'rgba(239, 68, 68, 0.15)',
+
+fill: true,
+
+tension: 0.3,
+
+pointBackgroundColor: '#f87171',
+
+pointRadius: 4
+
+}]
+
+},
+
+options: {
+
+responsive: true,
+
+maintainAspectRatio: false,
+
+scales: {
+
+x: {
+
+ticks: { color: '#94a3b8', font: { size: 10 } },
+
+grid: { color: 'rgba(255, 255, 255, 0.05)' }
+
+},
+
+y: {
+
+beginAtZero: true,
+
+ticks: { color: '#94a3b8', precision: 0 },
+
+grid: { color: 'rgba(255, 255, 255, 0.05)' }
+
+}
+
+},
+
+plugins: {
+
+legend: { display: false }
+
+}
+
+}
+
+});
+
+}
+
+
+
+function renderTable() {
+
+const tbody = document.getElementById('tableBody');
+
+tbody.innerHTML = '';
+
+
+
+if (filteredData.length === 0) {
+
+tbody.innerHTML = `<tr><td colspan="8"
+class="text-center py-8 text-slate-500">Tidak ada data laporan
+yang sesuai filter.</td></tr>`;
+
+document.getElementById('row-count').innerText = `Menampilkan 0 data`;
+
+document.getElementById('page-indicator').innerText = `Hal 0 dari 0`;
+
+document.getElementById('btn-prev').disabled = true;
+
+document.getElementById('btn-next').disabled = true;
+
+return;
+
+}
+
+
+
+// Sort data
+
+filteredData.sort((a, b) => {
+
+let valA = a[sortColumn] || '';
+
+let valB = b[sortColumn] || '';
+
+if (sortAsc) return valA.localeCompare(valB);
+
+return valB.localeCompare(valA);
+
+});
+
+
+
+// Pagination slice
+
+const totalPages = Math.ceil(filteredData.length / pageSize);
+
+const startIndex = (currentPage - 1) * pageSize;
+
+const pageData = filteredData.slice(startIndex, startIndex + pageSize);
+
+
+
+pageData.forEach((row) => {
+
+const tr = document.createElement('tr');
+
+tr.className = 'hover:bg-slate-800/50 transition-colors border-b border-slate-800/60';
+
+
+
+const sLower = (row.status || '').toLowerCase();
+
+const isSelesai = sLower.includes('selesai') || sLower.includes('tuntas') ||
+sLower.includes('teratasi') || sLower.includes('done');
+
+const statusBadge = isSelesai
+
+? `<span class="bg-emerald-500/15 text-emerald-400 border
+border-emerald-500/30 px-2.5 py-1 rounded-full text-[10px] font-bold
+inline-flex items-center gap-1 justify-center"><i
+class="fa-solid fa-circle-check"></i> ${escapeHtml(row.status)}</span>`
+
+: `<span class="bg-amber-500/15 text-amber-400 border
+border-amber-500/30 px-2.5 py-1 rounded-full text-[10px] font-bold inline-flex
+items-center gap-1 justify-center"><i class="fa-solid
+fa-hourglass-half"></i> ${escapeHtml(row.status)}</span>`;
+
+
+
+// Calculate Response Time status for Table Badge (15 Min SPM Threshold)
+
+const numMatch = String(row.responseTime || '').match(/\d+/);
+
+const respMins = numMatch ? parseInt(numMatch[0]) : 0;
+
+const isOvertime = respMins > 15;
+
+const responseBadge = isOvertime
+
+? `<span class="bg-red-500/20 text-red-400 border border-red-500/40
+px-2 py-1 rounded-lg font-mono font-bold text-[11px] inline-flex items-center
+gap-1.5 shadow-sm" title="Tidak Sesuai Standar SPM (>15
+Menit)"><i class="fa-solid fa-triangle-exclamation
+text-red-400"></i> ${escapeHtml(row.responseTime)} <span
+class="text-[9px] uppercase font-extrabold bg-red-600 text-white px-1.5
+py-0.5 rounded tracking-wide">Tidak Sesuai (&gt;15m)</span></span>`
+
+: `<span class="bg-cyan-500/10 text-cyan-400 border border-cyan-500/30
+px-2.5 py-1 rounded-lg font-mono font-bold text-[11px] inline-flex items-center
+gap-1"><i class="fa-solid fa-stopwatch
+text-cyan-400"></i> ${escapeHtml(row.responseTime)} <span
+class="text-[9px] uppercase font-semibold bg-emerald-500/20
+text-emerald-400 border border-emerald-500/30 px-1 rounded">Sesuai
+(≤15m)</span></span>`;
+
+
+
+tr.innerHTML = `
+
+<td class="py-3 px-5 font-mono text-slate-400
+whitespace-nowrap">${escapeHtml(row.timestamp)}</td>
+
+<td class="py-3 px-5 font-semibold
+text-white">${escapeHtml(row.pelapor)}</td>
+
+<td class="py-3 px-5"><span class="bg-red-500/10
+text-red-400 px-2.5 py-1 rounded-lg text-[11px] font-medium border
+border-red-500/20">${escapeHtml(row.jenis)}</span></td>
+
+<td class="py-3 px-5">${responseBadge}</td>
+
+<td class="py-3 px-5 text-slate-300 max-w-xs truncate"
+title="${escapeHtml(row.lokasi)}">${escapeHtml(row.lokasi)}</td>
+
+<td class="py-3 px-5 text-slate-400 max-w-xs truncate"
+title="${escapeHtml(row.keterangan)}">${escapeHtml(row.keterangan)}</td>
+
+<td class="py-3 px-5 text-center">${statusBadge}</td>
+
+<td class="py-3 px-5 text-center">
+
+<button onclick="openDetailModal(${row.id})"
+class="bg-slate-800 hover:bg-slate-700 text-sky-400 border
+border-slate-700 px-2.5 py-1 rounded-lg transition-all text-[11px] font-medium
+cursor-pointer">
+
+<i class="fa-solid fa-eye"></i> Detail
+
+</button>
+
+</td>
+
+`;
+
+tbody.appendChild(tr);
+
+});
+
+
+
+document.getElementById('row-count').innerText = `Menampilkan ${startIndex +
+1}-${Math.min(startIndex + pageSize, filteredData.length)} dari
+${filteredData.length} data`;
+
+document.getElementById('page-indicator').innerText = `Hal ${currentPage} dari
+${totalPages}`;
+
+document.getElementById('btn-prev').disabled = currentPage === 1;
+
+document.getElementById('btn-next').disabled = currentPage === totalPages ||
+totalPages === 0;
+
+}
+
+
+
+function nextPage() {
+
+const totalPages = Math.ceil(filteredData.length / pageSize);
+
+if (currentPage < totalPages) {
+
+currentPage++;
+
+renderTable();
+
+}
+
+}
+
+
+
+function prevPage() {
+
+if (currentPage > 1) {
+
+currentPage--;
+
+renderTable();
+
+}
+
+}
+
+
+
+function changePageSize() {
+
+pageSize = parseInt(document.getElementById('page-size').value);
+
+currentPage = 1;
+
+renderTable();
+
+}
+
+
+
+function escapeHtml(text) {
+
+if (!text) return '';
+
+return String(text).replace(/&/g, "&amp;").replace(/</g,
+"&lt;").replace(/>/g, "&gt;");
+
+}
+
+
+
+function openDetailModal(id) {
+
+const item = rawData.find(d => d.id === id);
+
+if (!item) return;
+
+
+
+document.getElementById('modal-time').innerText = item.timestamp;
+
+document.getElementById('modal-pelapor').innerText = item.pelapor;
+
+document.getElementById('modal-jenis').innerText = item.jenis;
+
+document.getElementById('modal-response-time').innerText = item.responseTime;
+
+document.getElementById('modal-lokasi').innerText = item.lokasi;
+
+document.getElementById('modal-keterangan').innerText = item.keterangan;
+
+
+
+const sLower = (item.status || '').toLowerCase();
+
+const isSelesai = sLower.includes('selesai') || sLower.includes('tuntas') ||
+sLower.includes('teratasi') || sLower.includes('done');
+
+document.getElementById('modal-status').innerHTML = isSelesai
+
+? `<span class="bg-emerald-500/20 text-emerald-400 border
+border-emerald-500/30 px-3 py-1 rounded-full text-xs font-bold inline-flex
+items-center gap-1.5"><i class="fa-solid
+fa-circle-check"></i> ${escapeHtml(item.status)}</span>`
+
+: `<span class="bg-amber-500/20 text-amber-400 border
+border-amber-500/30 px-3 py-1 rounded-full text-xs font-bold inline-flex
+items-center gap-1.5"><i class="fa-solid
+fa-hourglass-half"></i> ${escapeHtml(item.status)}</span>`;
+
+
+
+// Check SPM response time status (>15 Min trigger)
+
+const numMatch = String(item.responseTime || '').match(/\d+/);
+
+const respMinutes = numMatch ? parseInt(numMatch[0]) : 10;
+
+const badgeEl = document.getElementById('modal-response-badge');
+
+if (respMinutes <= 15) {
+
+badgeEl.className = 'text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2.5 py-1 rounded-full font-bold inline-flex items-center gap-1';
+
+badgeEl.innerHTML = '<i class="fa-solid fa-circle-check"></i> Sesuai Standar SPM (≤15 Min)';
+
+} else {
+
+badgeEl.className = 'text-[10px] bg-red-500/25 text-red-300 border border-red-500/50 px-2.5 py-1 rounded-full font-bold inline-flex items-center gap-1 animate-pulse';
+
+badgeEl.innerHTML = '<i class="fa-solid fa-triangle-exclamation text-red-400"></i> Tidak Sesuai Standar SPM (>15 Min)';
+
+}
+
+
+
+document.getElementById('modal-map-btn').href =
+`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.lokasi)}`;
+
+
+
+// Dynamically render all original columns from Google Sheets in the detail
+modal
+
+const rawContainer = document.getElementById('modal-raw-fields');
+
+if (rawContainer && item.rawRow) {
+
+rawContainer.innerHTML = '';
+
+Object.keys(item.rawRow).forEach(key => {
+
+const val = item.rawRow[key];
+
+const fieldDiv = document.createElement('div');
+
+fieldDiv.className = 'p-2 rounded-lg bg-slate-900/90 border border-slate-800 text-[11px]';
+
+fieldDiv.innerHTML = `<span class="text-amber-300 font-semibold
+block">${escapeHtml(key)}:</span> <span
+class="text-slate-200">${escapeHtml(String(val ||
+'-'))}</span>`;
+
+rawContainer.appendChild(fieldDiv);
+
+});
+
+}
+
+
+
+document.getElementById('detail-modal').classList.remove('hidden');
+
+}
+
+
+
+function closeDetailModal() {
+
+document.getElementById('detail-modal').classList.add('hidden');
+
+}
+
+
+
+function changeAutoSyncInterval() {
+
+const val = parseInt(document.getElementById('auto-sync-select').value);
+
+if (autoSyncTimer) clearInterval(autoSyncTimer);
+
+
+
+if (val > 0) {
+
+autoSyncTimer = setInterval(fetchData, val);
+
+document.getElementById('next-sync-label').innerText = `Auto-sync aktif
+(${val/1000}s)`;
+
+} else {
+
+document.getElementById('next-sync-label').innerText = `Auto-sync
+dinonaktifkan`;
+
+}
+
+}
+
+
+
+function exportCSV() {
+
+if (filteredData.length === 0) {
+
+showNotification("Tidak ada data untuk diexport.", true);
+
+return;
+
+}
+
+
+
+const csvData = Papa.unparse(filteredData.map(d => ({
+
+"Timestamp": d.timestamp,
+
+"Nama Pelapor": d.pelapor,
+
+"Jenis Kejadian": d.jenis,
+
+"Response Time": d.responseTime,
+
+"Lokasi": d.lokasi,
+
+"Keterangan": d.keterangan,
+
+"Status": d.status
+
+})));
+
+
+
+const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
+
+const link = document.createElement("a");
+
+const url = URL.createObjectURL(blob);
+
+link.setAttribute("href", url);
+
+link.setAttribute("download", `laporan_damkar_${new
+Date().toISOString().substring(0,10)}.csv`);
+
+document.body.appendChild(link);
+
+link.click();
+
+document.body.removeChild(link);
+
+}
+
+
+
+// Initialize Application
+
+window.onload = function() {
+
+fetchData();
+
+changeAutoSyncInterval();
+
+};
+
+</script>
+
+</body>
+
+</html>
